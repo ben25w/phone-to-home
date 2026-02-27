@@ -253,3 +253,74 @@ h1 {
     height: 10px;
   }
 }
+/* Video Modal */
+.video-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0a1e4d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.video-container {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.video-container h2 {
+  color: white;
+  text-align: center;
+  font-size: 24px;
+  margin: 0;
+}
+
+.video-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: black;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.try-again-btn {
+  padding: 15px 50px;
+  background: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.try-again-btn:hover {
+  background: #FFC700;
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .video-wrapper {
+    aspect-ratio: 9 / 16;
+  }
+
+  .video-container h2 {
+    font-size: 20px;
+  }
+
+  .try-again-btn {
+    padding: 12px 40px;
+    font-size: 16px;
+  }
+}
+
