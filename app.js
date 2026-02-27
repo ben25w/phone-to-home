@@ -129,7 +129,7 @@ function openOptionsModal(position) {
 
 function generateDiceFace(num) {
   const patterns = {
-    1: [[1, 1, 1], [1, 0, 1], [1, 1, 1]],
+    1: [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
     2: [[1, 0, 0], [0, 0, 0], [0, 0, 1]],
     3: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
     4: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
@@ -149,10 +149,10 @@ function generateDiceFace(num) {
 
 function generateSpots(num) {
   const positions = {
-    1: [[1, 1, 1], [1, 1, 1], [1, 0, 1]],
-    2: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-    3: [[1, 0, 1], [0, 1, 0], [1, 0, 1]],
-    4: [[0, 1, 0], [1, 0, 1], [0, 1, 0]],
+    1: [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
+    2: [[1, 0, 0], [0, 0, 0], [0, 0, 1]],
+    3: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+    4: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
     5: [[1, 0, 1], [0, 1, 0], [1, 0, 1]]
   };
 
@@ -198,6 +198,16 @@ function shuffle(array) {
   return arr;
 }
 
+function extractFileId(driveLink) {
+  const match = driveLink.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  return match ? match[1] : null;
+}
+
+function getEmbedUrl(driveLink) {
+  const fileId = extractFileId(driveLink);
+  return fileId ? `https://drive.google.com/file/d/${fileId}/preview` : null;
+}
+
 document.getElementById('submitBtn').addEventListener('click', checkCode);
 
 function checkCode() {
@@ -207,13 +217,63 @@ function checkCode() {
   const match = sheetData.find(row => row.passcode === enteredCode);
 
   if (match) {
-    // Correct code - redirect to their video
-    window.location.href = match.videoLink;
+    // Correct code - show their video
+    playVideo(match.videoLink, match.name);
   } else {
-    // Wrong code - redirect to random fallback
+    // Wrong code - show random fallback
     const randomFallback = fallbackVideos[Math.floor(Math.random() * fallbackVideos.length)];
-    window.location.href = randomFallback;
+    playVideo(randomFallback, 'Oops! Wrong code');
   }
+}
+
+function playVideo(driveLink, title) {
+  const embedUrl = getEmbedUrl(driveLink);
+  
+  if (!embedUrl) {
+    alert('Error: Could not load video');
+    return;
+  }
+
+  // Hide main content
+  document.querySelector('.container').style.display = 'none';
+
+  // Create video player modal
+  const videoModal = document.createElement('div');
+  videoModal.id = 'videoModal';
+  videoModal.className = 'video-modal';
+  videoModal.innerHTML = `
+    <div class="video-container">
+      <h2>${title}</h2>
+      <div class="video-wrapper">
+        <iframe 
+          src="${embedUrl}" 
+          allow="autoplay"
+          frameborder="0"
+          style="width: 100%; height: 100%;">
+        </iframe>
+      </div>
+      <button id="tryAgainBtn" class="try-again-btn">Try Again</button>
+    </div>
+  `;
+
+  document.body.appendChild(videoModal);
+
+  // Try Again button resets everything
+  document.getElementById('tryAgainBtn').addEventListener('click', () => {
+    videoModal.remove();
+    document.querySelector('.container').style.display = 'block';
+    resetGame();
+  });
+}
+
+function resetGame() {
+  currentCode = [null, null, null, null, null];
+  document.querySelectorAll('.box-value').forEach(box => {
+    box.textContent = '-';
+    box.classList.add('empty');
+  });
+  document.getElementById('submitBtn').classList.add('hidden');
+  setActiveBox(0);
 }
 
 // Initialize on load
