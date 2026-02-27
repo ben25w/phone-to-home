@@ -148,24 +148,28 @@ function generateDiceFace(num) {
 }
 
 function generateSpots(num) {
-  const positions = {
-    1: [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
-    2: [[1, 0, 0], [0, 0, 0], [0, 0, 1]],
-    3: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-    4: [[1, 0, 1], [0, 0, 0], [1, 0, 1]],
-    5: [[1, 0, 1], [0, 1, 0], [1, 0, 1]]
-  };
-
-  const pattern = positions[num];
+  // Create 9 empty positions (3x3 grid)
+  const grid = Array(9).fill(0);
+  
+  // Randomly select N positions to place dots
+  const randomPositions = [];
+  while (randomPositions.length < num) {
+    const pos = Math.floor(Math.random() * 9);
+    if (!randomPositions.includes(pos)) {
+      randomPositions.push(pos);
+      grid[pos] = 1;
+    }
+  }
+  
+  // Generate HTML for 3x3 grid
   let html = '<div class="option-dice">';
-  pattern.forEach(row => {
-    row.forEach(cell => {
-      html += cell ? '<div class="dot"></div>' : '<div class="dot empty"></div>';
-    });
-  });
+  for (let i = 0; i < 9; i++) {
+    html += grid[i] ? '<div class="dot"></div>' : '<div class="dot empty"></div>';
+  }
   html += '</div>';
   return html;
 }
+
 
 function selectNumber(position, num) {
   currentCode[position] = num;
